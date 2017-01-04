@@ -7,6 +7,8 @@ When you launch the application, a new item shows on the status bar, with an ico
 
 Clicking on the individual buttons shows you the _converted_ text in the bottom textview. 
 
+This isn't the prettiest thing in the world, but it was done in one evening after I got tired of fixing/standardising titles. I first attempted to do this using AppleScript, but it kept crashing on me and I didn't quite understand the syntax so decided to write this instead. 
+
 ## Technology and testing 
 
 This application has been developed using Xcode 8.2.1 and Swift 3 on macOS 10.12.1. 
