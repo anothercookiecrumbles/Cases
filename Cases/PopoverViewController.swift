@@ -115,6 +115,10 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
                 else if (dotPredicate.evaluate(with: word)) {
                     print("Continuing after dot predicate matched.")
                 }
+                // Always capitalize compound/hyphenated words
+                else if (word?.contains("-"))! {
+                    word = word?.capitalized
+                }
                 // Always title-case the first word and the last word
                 else if (final.isEmpty || scanner.isAtEnd) {
                     word = word?.capitalized
