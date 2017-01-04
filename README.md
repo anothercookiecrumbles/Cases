@@ -26,7 +26,7 @@ These are as follows:
   - "capitalised" refers to the first letter of the word being in upper case and the rest in lower
 - If a "word" has a dot (or multiple dots) in it, nothing changes. e.g. "apple.com" or "i.e."
 - The first word of a quote is always capitalised (only the first character of the word, if you want to be pedantic)
-- The first word after an end mark (".", "!", "?" is always capitalised)
+- The first word after an end mark (".", "!", "?") is always capitalised
 - The first word after a colon (":") is always capitalised
 - Articles ("a", "the", "an") are always capitalised
 - There is a set of words that should always be capitalised (an empty set at the moment) and a set of words that should always be in lower case (only one entry at the moment: "is")
