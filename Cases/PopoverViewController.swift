@@ -43,18 +43,22 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
         super.viewDidLoad()
         // Do view setup here.
         
+        // Initialise the predicates that'll be needed to check for camel-cased words and words with dot(s).
         capitalizationPredicate = NSPredicate(format: "SELF MATCHES %@", specialCapitalizationRegex)
         dotPredicate = NSPredicate(format: "SELF MATCHES %@", dotRegex)
         
+        // Initialise the LinguisticTagger so that we can identify parts of speech.
         tagger = NSLinguisticTagger(tagSchemes: schemes, options: Int(options.rawValue))
         
-        convertableTextView.delegate = self
+        // Yeah, this is a bit crummy but for some reason, NSTextView doesn't support placeholder values. 
+        // I know, I know, I should add it manually.
         convertableTextView.string = ""
         
+        // Ensure that the textview that shows the _converted_ text is read-only but users can select the text (mostly 
+        // so that they can copy it).
         convertedTextView.isEditable = false
         convertedTextView.isSelectable = true
-        convertedTextView.string = "Converted text appears here."
-
+        convertedTextView.string = "Converted text appears here." // default boring string; should've been as a placeholder but... sigh
     }
     
     // Convert using the AP stylebook guidelines:
@@ -76,15 +80,13 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
             }
         }
         
-        print(lowercasable)
-        
         let scanner = Scanner(string: convertable!)
         scanner.caseSensitive = true
         
         var final = [String]()
         
         while !scanner.isAtEnd {
-            // Get word
+            // Get word by continuously scanning until we hit whitespace or end of line.
             var extracted: NSString? = nil
             scanner.scanUpToCharacters(from: whitespaceSet, into: &extracted)
             
@@ -142,26 +144,28 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
                     }
                 }
                 
+                // Add word to array, which will eventually be converted to a string.
                 final.append(word!)
             }
-
         }
         
-        let scanned_string = final.joined(separator: " ")
-        convertedTextView.string = scanned_string
-        
+        // And finally show the converted text in the display. 
+        convertedTextView.string = final.joined(separator: " ")
     }
     
+    // Clears the NSTextViews so that each time you open the app it's clean.
     func clear() {
         convertedTextView.string = "Converted text appears here."
         convertableTextView.string = ""
     }
     
+    // Converts text to lower case (blindly) and displays it in the bottom NSTextView.
     @IBAction func convertToLower(_ sender: Any) {
         let convertable = convertableTextView.string
         convertedTextView.string = convertable?.lowercased()
     }
     
+    // Blindly converts text to upper case and displays the converted text in the bottom NSTextView.
     @IBAction func convertToUpper(_ sender: Any) {
         let convertable = convertableTextView.string
         convertedTextView.string = convertable?.uppercased()
