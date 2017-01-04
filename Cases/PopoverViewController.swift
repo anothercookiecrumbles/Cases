@@ -13,6 +13,8 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
     @IBOutlet var convertableTextView: NSTextView!
     @IBOutlet var convertedTextView: NSTextView!
     
+    var copyToClipboard: Bool = true
+    
     // Bunch of variables set up for `convertToTitle`
     let whitespaceSet = NSCharacterSet.whitespaces
     let articles: Set<String> = ["A", "the", "an"]
@@ -42,6 +44,12 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
+        
+        // Aesthetics
+        createRoundedRect(view: convertableTextView)
+        createRoundedRect(view: convertedTextView)
+        convertedTextView.textContainerInset = NSSize(width: 10, height: 10)
+        convertableTextView.textContainerInset = NSSize(width: 10, height: 10)
         
         // Initialise the predicates that'll be needed to check for camel-cased words and words with dot(s).
         capitalizationPredicate = NSPredicate(format: "SELF MATCHES %@", specialCapitalizationRegex)
@@ -151,6 +159,10 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
         
         // And finally show the converted text in the display. 
         convertedTextView.string = final.joined(separator: " ")
+        if (copyToClipboard) {
+            NSPasteboard.general().clearContents()
+            NSPasteboard.general().setString(convertedTextView.string!, forType: NSPasteboardTypeString)
+        }
     }
     
     // Clears the NSTextViews so that each time you open the app it's clean.
@@ -159,16 +171,34 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
         convertableTextView.string = ""
     }
     
+    func createRoundedRect(view: NSView) {
+        view.wantsLayer = true
+        view.layer?.cornerRadius = 8
+        view.layer?.masksToBounds = true
+    }
+    
     // Converts text to lower case (blindly) and displays it in the bottom NSTextView.
     @IBAction func convertToLower(_ sender: Any) {
         let convertable = convertableTextView.string
         convertedTextView.string = convertable?.lowercased()
+        if (copyToClipboard) {
+            NSPasteboard.general().clearContents()
+            NSPasteboard.general().setString(convertedTextView.string!, forType: NSPasteboardTypeString)
+        }
     }
     
     // Blindly converts text to upper case and displays the converted text in the bottom NSTextView.
     @IBAction func convertToUpper(_ sender: Any) {
         let convertable = convertableTextView.string
         convertedTextView.string = convertable?.uppercased()
+        if (copyToClipboard) {
+            NSPasteboard.general().clearContents()
+            NSPasteboard.general().setString(convertedTextView.string!, forType: NSPasteboardTypeString)
+        }
+    }
+
+    @IBAction func enableCopyToClipboard(_ sender: NSButtonCell) {
+        copyToClipboard = !copyToClipboard
     }
     
 }
