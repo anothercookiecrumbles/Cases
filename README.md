@@ -26,6 +26,7 @@ These are as follows:
 - The first word and the last word are always camel-cased or capitalised
   - "camel-cased" refers to words like "macOS" or "iPhone"; 
   - "capitalised" refers to the first letter of the word being in upper case and the rest in lower
+- Hyphenated (Compound) words are always capitalised (e.g. band-aid, state-of-the-art)
 - If a "word" has a dot (or multiple dots) in it, nothing changes. e.g. "apple.com" or "i.e."
 - The first word of a quote is always capitalised (only the first character of the word, if you want to be pedantic)
 - The first word after an end mark (".", "!", "?") is always capitalised
