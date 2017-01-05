@@ -39,6 +39,11 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
     
     override func viewWillAppear() {
         clear()
+     
+        // Ensures focus is always on the convertableTextView, because, if not, it's annoying.
+        // This seems like a hack, but hey, it works. 
+        NSApp.activate(ignoringOtherApps: true)
+        convertableTextView.window?.makeFirstResponder(convertableTextView)
     }
 
     override func viewDidLoad() {
@@ -50,6 +55,7 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
         createRoundedRect(view: convertedTextView)
         convertedTextView.textContainerInset = NSSize(width: 10, height: 10)
         convertableTextView.textContainerInset = NSSize(width: 10, height: 10)
+        convertableTextView.isRichText = false
         
         // Initialise the predicates that'll be needed to check for camel-cased words and words with dot(s).
         capitalizationPredicate = NSPredicate(format: "SELF MATCHES %@", specialCapitalizationRegex)
@@ -67,6 +73,8 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
         convertedTextView.isEditable = false
         convertedTextView.isSelectable = true
         convertedTextView.string = "Converted text appears here." // default boring string; should've been as a placeholder but... sigh
+        
+        convertableTextView.delegate = self
     }
     
     // Convert using the AP stylebook guidelines:
