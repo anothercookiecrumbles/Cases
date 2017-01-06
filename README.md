@@ -31,5 +31,5 @@ These are as follows:
 - The first word of a quote is always capitalised (only the first character of the word, if you want to be pedantic)
 - The first word after an end mark (".", "!", "?") is always capitalised
 - The first word after a colon (":") is always capitalised
-- Articles ("a", "the", "an") are always capitalised
-- There is a set of words that should always be capitalised (an empty set at the moment) and a set of words that should always be in lower case (only one entry at the moment: "is")
+- Articles ("a", "the", "an") are always in lowercase
+- There is a set of words that should always be capitalised (an empty set at the moment) and a set of words that should always be in lower case (current entries: "is", "to")
