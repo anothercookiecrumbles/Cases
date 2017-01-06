@@ -13,13 +13,14 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
     @IBOutlet var convertableTextView: NSTextView!
     @IBOutlet var convertedTextView: NSTextView!
     
+    // When the text is converted, should it automatically be added to the clipboard
     var copyToClipboard: Bool = true
     
     // Bunch of variables set up for `convertToTitle`
     let whitespaceSet = NSCharacterSet.whitespaces
     let articles: Set<String> = ["A", "the", "an"]
     let alwaysCapitalise: Set<String> = []
-    let alwaysLowercase: Set<String> = ["is"]
+    let alwaysLowercase: Set<String> = ["is", "to"]
     let endMarks: Set<Character> = ["!", "?", "."]
     
     // Regex for words which have a capital letter _inside_; e.g. macOS, iOS, etc.
@@ -41,7 +42,7 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
         clear()
      
         // Ensures focus is always on the convertableTextView, because, if not, it's annoying.
-        // This seems like a hack, but hey, it works. 
+        // This seems like a hack, but hey, it works.
         NSApp.activate(ignoringOtherApps: true)
         convertableTextView.window?.makeFirstResponder(convertableTextView)
     }
@@ -82,7 +83,7 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
     // - Capitalize an article – the, a, an – or words of fewer than four letters if it is the first or
     // last word in a title.
     @IBAction func convertToTitle(_ sender: Any) {
-        let convertable = convertableTextView.string
+        var convertable = convertableTextView.string
         
         // Keep local set of conjunctions and prepositions
         var lowercasable: Set<String> = []
@@ -91,9 +92,15 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
         tagger.string = convertable
         tagger.enumerateTags(in: NSMakeRange(0, (NSString(string:convertable!)).length), scheme: NSLinguisticTagSchemeNameTypeOrLexicalClass, options: options) { (tag, tokenRange, _, _) in
             let token = (NSString(string:convertable!)).substring(with: tokenRange)
+            print(tag + "|" + token)
+
             if (tag == "Preposition" || tag == "Conjunction") {
-                lowercasable.insert(token)
+                lowercasable.insert(token.lowercased())
             }
+        }
+        
+        if (convertable?.uppercased() == convertable) {
+            convertable = convertable?.capitalized
         }
         
         let scanner = Scanner(string: convertable!)
@@ -137,18 +144,18 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
                 }
                 // Always capitalize articles
                 else if (articles.contains(word!.lowercased())) {
-                    word = word!.capitalized
+                    word = word!.lowercased()
                 }
                 // Always capitalize words in `alwaysCapitalize` set
                 else if (alwaysCapitalise.contains(word!)) {
                     word = word!.capitalized
                 }
                 // Always lower-case words in `alwaysLowercase` set
-                else if (alwaysLowercase.contains(word!)) {
+                else if (alwaysLowercase.contains(word!.lowercased())) {
                     word = word!.lowercased()
                 }
                 // Lower-case prepositions and conjunctions unless they're >= 4 characters
-                else if (lowercasable.contains(word!) && word!.characters.count < 4) {
+                else if (lowercasable.contains(word!.lowercased()) && word!.characters.count < 4) {
                     word = word!.lowercased()
                 }
                 // This is probably OK? :/
