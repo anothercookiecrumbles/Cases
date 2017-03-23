@@ -83,15 +83,18 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
     // - Capitalize an article – the, a, an – or words of fewer than four letters if it is the first or
     // last word in a title.
     @IBAction func convertToTitle(_ sender: Any) {
-        var convertable = convertableTextView.string
+        let original = convertableTextView.string
+        
+        // Replace dumb quotes with smart quotes
+        var convertable = useSmartQuotes(convertable: original!)
         
         // Keep local set of conjunctions and prepositions
         var lowercasable: Set<String> = []
         
         // First, let's get the parts-of-speech tags
         tagger.string = convertable
-        tagger.enumerateTags(in: NSMakeRange(0, (NSString(string:convertable!)).length), scheme: NSLinguisticTagSchemeNameTypeOrLexicalClass, options: options) { (tag, tokenRange, _, _) in
-            let token = (NSString(string:convertable!)).substring(with: tokenRange)
+        tagger.enumerateTags(in: NSMakeRange(0, (NSString(string:convertable)).length), scheme: NSLinguisticTagSchemeNameTypeOrLexicalClass, options: options) { (tag, tokenRange, _, _) in
+            let token = (NSString(string:convertable)).substring(with: tokenRange)
             print(tag + "|" + token)
 
             if (tag == "Preposition" || tag == "Conjunction") {
@@ -99,11 +102,11 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
             }
         }
         
-        if (convertable?.uppercased() == convertable) {
-            convertable = convertable?.capitalized
+        if (convertable.uppercased() == convertable) {
+            convertable = convertable.capitalized
         }
         
-        let scanner = Scanner(string: convertable!)
+        let scanner = Scanner(string: convertable)
         scanner.caseSensitive = true
         
         var final = [String]()
@@ -142,7 +145,7 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
                 else if (word!.characters.first == "\"") {
                     word = word!.capitalized
                 }
-                // Always capitalize articles
+                // Always lowercase articles
                 else if (articles.contains(word!.lowercased())) {
                     word = word!.lowercased()
                 }
@@ -182,6 +185,34 @@ class PopoverViewController: NSViewController, NSTextViewDelegate{
             NSPasteboard.general().clearContents()
             NSPasteboard.general().setString(convertedTextView.string!, forType: NSPasteboardTypeString)
         }
+    }
+
+    // Convert dumb quotes to smartquotes because dumb quotes are awful.
+    func useSmartQuotes(convertable: String) -> String{
+        
+        var returnable = convertable
+        
+        let right_dq_pattern = "([a-zA-Z0-9.,?!;:'\"])\""
+        let regex = try! NSRegularExpression(pattern: right_dq_pattern, options: [])
+        returnable = regex.stringByReplacingMatches(in: returnable, options: [], range: NSRange(0..<returnable.utf16.count), withTemplate: "\u{201D}")
+
+        // Replace all other dumbquotes with left smart quote.
+        returnable = returnable.replacingOccurrences(of: "\"", with: "\u{201C}")
+        
+        // Do the same thing for single quotes.
+
+        // Replace all other dumbquotes with left smart quote.
+        // If there's a space preceding the single quote or if it's the start of line, then use left quote.
+        returnable = returnable.replacingOccurrences(of: " \'", with: "\u{2018}")
+        
+        if (returnable[returnable.startIndex] == "\'") {
+            returnable = "\u{2018}" + String(returnable.characters.dropFirst())
+        }
+        
+        // ...else use right quote.
+        returnable = returnable.replacingOccurrences(of: "'", with: "\u{2019}")
+        
+        return returnable
     }
     
     // Clears the NSTextViews so that each time you open the app it's clean.
