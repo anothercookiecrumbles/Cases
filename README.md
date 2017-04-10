@@ -33,4 +33,4 @@ These are as follows:
 - The first word after a colon (":") is always capitalised
 - Articles ("a", "the", "an") are always in lowercase
 - There is a set of words that should always be capitalised (an empty set at the moment) and a set of words that should always be in lower case (current entries: "is", "to")
-- It always uses smartquotes. 
+- It always uses smartquotes
